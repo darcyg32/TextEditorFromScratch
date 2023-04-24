@@ -3,16 +3,28 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <errno.h>
 
 struct termios orig_termios;
 
+void die(const char *s) {
+    perror(s); // Prints error message
+    exit(1); // Exits program
+}
+
 void disableRawMode() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    // Disables raw mode and also checks for error
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) {
+        die("tcsetattr");
+    }
 }
 
 void enableRawMode() {
     
-    tcgetattr(STDIN_FILENO, &orig_termios); // Stores orginal terminal attributes into orig_termios
+    // Stores orginal terminal attributes into orig_termios, also checks for error
+    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) {
+        die("tcgetattr");
+    } 
     atexit(disableRawMode); // disabled Raw Mode when program exits
 
     struct termios raw = orig_termios;
@@ -23,7 +35,9 @@ void enableRawMode() {
     raw.c_cc[VMIN] = 0; // Timeout function, sets min number of bytes of input needed before read() can return
     raw.c_cc[VTIME] = 1; // Timeout function, sets 10ths of a second that read() will wait
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
+        die("tcsetattr");
+    };
 }
 
 
@@ -34,7 +48,11 @@ int main() {
     // Read one byte from std input at a time into c, until there are none left to read in. (read() returns no. of bytes read in)
     while (1) {
         char c = '\0';
-        read(STDIN_FILENO, &c, 1);
+        // Reads in character and checks for error
+        // When read() times out, it returns -1 with errno of EAGAIN
+        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) {
+            die("read");
+        }
         if (iscntrl(c)) { // if c is a control character, print it as a decimal number (it's ASCII code)
             printf("%d\r\n", c);
         } else { // Else, print out it's ASCII code and c itself
