@@ -1,3 +1,5 @@
+/*** includes ***/
+
 #include <stdlib.h> 
 #include <termios.h> // For enabling raw mode
 #include <unistd.h>
@@ -5,7 +7,11 @@
 #include <stdio.h>
 #include <errno.h>
 
+/*** data ***/
+
 struct termios orig_termios;
+
+/*** terminal ***/
 
 void die(const char *s) {
     perror(s); // Prints error message
@@ -40,6 +46,7 @@ void enableRawMode() {
     };
 }
 
+/***init***/
 
 int main() {
     // Enables raw mode
