@@ -16,7 +16,8 @@ void enableRawMode() {
     atexit(disableRawMode); // disabled Raw Mode when program exits
 
     struct termios raw = orig_termios;
-    raw.c_iflag &= ~(ICRNL | IXON); // ICRNL allows ctrl-M, IXON allows ctrl-s/q
+    raw.c_iflag &= ~(ICRNL | IXON); // ICRNL allows ctrl-m, IXON allows ctrl-s/q
+    raw.c_oflag &= ~(OPOST); // OPOST turns off output processing (means we require "\r\n" when we want a newline.)
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG ); // Allows us to read in byte by byte, instead of line by line. ISIG allows ctrl-c/z. IEXTEN allows ctrl-v
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
@@ -31,9 +32,9 @@ int main() {
     char c;
     while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
         if (iscntrl(c)) { // if c is a control character, print it as a decimal number (it's ASCII code)
-            printf("%d\n", c);
+            printf("%d\r\n", c);
         } else { // Else, print out it's ASCII code and c itself
-            printf("%d ('%c')\n", c, c);
+            printf("%d ('%c')\r\n", c, c);
         }
     }
 
