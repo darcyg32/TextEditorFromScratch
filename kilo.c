@@ -16,7 +16,9 @@ void enableRawMode() {
     atexit(disableRawMode); // disabled Raw Mode when program exits
 
     struct termios raw = orig_termios;
-    raw.c_lflag &= ~(ECHO | ICANON); // Allows us to read in byte by byte, instead of line by line
+    raw.c_iflag &= ~(ICRNL | IXON); // ICRNL allows ctrl-M, IXON allows ctrl-s/q
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG ); // Allows us to read in byte by byte, instead of line by line. ISIG allows ctrl-c/z. IEXTEN allows ctrl-v
+
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
