@@ -16,8 +16,9 @@ void enableRawMode() {
     atexit(disableRawMode); // disabled Raw Mode when program exits
 
     struct termios raw = orig_termios;
-    raw.c_iflag &= ~(ICRNL | IXON); // ICRNL allows ctrl-m, IXON allows ctrl-s/q
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); // ICRNL allows ctrl-m, IXON allows ctrl-s/q
     raw.c_oflag &= ~(OPOST); // OPOST turns off output processing (means we require "\r\n" when we want a newline.)
+    raw.c_oflag |= (CS8); // Sets character size to 8 bits per byte
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG ); // Allows us to read in byte by byte, instead of line by line. ISIG allows ctrl-c/z. IEXTEN allows ctrl-v
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
