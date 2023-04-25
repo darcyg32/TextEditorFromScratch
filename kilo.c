@@ -18,6 +18,9 @@ struct termios orig_termios;
 /*** terminal ***/
 
 void die(const char *s) {
+    write(STDOUT_FILENO, "\x1b[2J", 4); // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
+    write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the cursor, default is 1;1H, or first row&column
+
     perror(s); // Prints error message
     exit(1); // Exits program
 }
@@ -68,7 +71,7 @@ char editorReadKey() {
 
 void editorRefreshScreen() { 
     write(STDOUT_FILENO, "\x1b[2J", 4); // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
-    write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the curser, default is 1;1H, or first row&column
+    write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the cursor, default is 1;1H, or first row&column
 }
 
 /*** input ***/
@@ -78,6 +81,8 @@ void editorProcessKeypress() { // Checks inputted character
 
     switch (c) {
         case CTRL_KEY('q'): // If ctrl+q is entered, exit
+            write(STDOUT_FILENO, "\x1b[2J", 4); // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
+            write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the cursor, default is 1;1H, or first row&column
             exit(0);
             break;
     }
