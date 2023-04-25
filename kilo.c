@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <errno.h>
 
+/*** defines ***/
+
+#define CTRL_KEY(k) ((k) & 0x1f) // Defines that CTRL_KEY(k) takes away bits 5&6 from k, to equal the correct ASCII code
+
 /*** data ***/
 
 struct termios orig_termios;
@@ -65,7 +69,7 @@ int main() {
         } else { // Else, print out it's ASCII code and c itself
             printf("%d ('%c')\r\n", c, c);
         }
-        if (c == 'q') {
+        if (c == CTRL_KEY('q')) { // If ctrl+q is pressed, exit
             break;
         }
     }
