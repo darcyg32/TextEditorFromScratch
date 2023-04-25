@@ -69,9 +69,20 @@ char editorReadKey() {
 
 /*** output ***/
 
+void editorDrawRows() { // Draw rows of ~
+    int y;
+    for (y = 0 ; y < 24 ; y++) {
+        write(STDOUT_FILENO, "~\r\n", 3); // (\r\n is needed for new line)
+    }
+}
+
 void editorRefreshScreen() { 
     write(STDOUT_FILENO, "\x1b[2J", 4); // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
     write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the cursor, default is 1;1H, or first row&column
+
+    editorDrawRows(); // Draw rows
+
+    write(STDOUT_FILENO, "\x1b[H", 3); // Reposition cursor
 }
 
 /*** input ***/
