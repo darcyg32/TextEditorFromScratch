@@ -64,10 +64,17 @@ char editorReadKey() {
     return c;
 }
 
+/*** output ***/
+
+void editorRefreshScreen() { 
+    // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+}
+
 /*** input ***/
 
-// Checks inputted character
-void editorProcessKeypress() {
+void editorProcessKeypress() { // Checks inputted character
+
     char c = editorReadKey();
 
     switch (c) {
@@ -85,6 +92,7 @@ int main() {
 
     // Read one byte from std input at a time into c, until there are none left to read in. (read() returns no. of bytes read in)
     while (1) {
+        editorRefreshScreen();
         editorProcessKeypress();
     }
 
