@@ -67,14 +67,13 @@ char editorReadKey() {
 /*** output ***/
 
 void editorRefreshScreen() { 
-    // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
-    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[2J", 4); // Writes escape sequence to terminal, \x1b to escape, [2J to clear entire screen
+    write(STDOUT_FILENO, "\x1b[H", 3); // H command to position the curser, default is 1;1H, or first row&column
 }
 
 /*** input ***/
 
 void editorProcessKeypress() { // Checks inputted character
-
     char c = editorReadKey();
 
     switch (c) {
@@ -87,8 +86,7 @@ void editorProcessKeypress() { // Checks inputted character
 /*** init ***/
 
 int main() {
-    // Enables raw mode
-    enableRawMode();
+    enableRawMode(); // Enables raw mode
 
     // Read one byte from std input at a time into c, until there are none left to read in. (read() returns no. of bytes read in)
     while (1) {
