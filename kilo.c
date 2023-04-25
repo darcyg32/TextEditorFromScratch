@@ -50,7 +50,34 @@ void enableRawMode() {
     };
 }
 
-/***init***/
+char editorReadKey() {
+    int nread;
+    char c;
+
+    // Reads in character and checks for error
+    // When read() times out, it returns -1 with errno of EAGAIN
+    while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
+        if (nread == -1 && errno != EAGAIN) {
+            die("read");
+        }
+    }
+    return c;
+}
+
+/*** input ***/
+
+// Checks inputted character
+void editorProcessKeypress() {
+    char c = editorReadKey();
+
+    switch (c) {
+        case CTRL_KEY('q'): // If ctrl+q is entered, exit
+            exit(0);
+            break;
+    }
+}
+
+/*** init ***/
 
 int main() {
     // Enables raw mode
@@ -58,20 +85,7 @@ int main() {
 
     // Read one byte from std input at a time into c, until there are none left to read in. (read() returns no. of bytes read in)
     while (1) {
-        char c = '\0';
-        // Reads in character and checks for error
-        // When read() times out, it returns -1 with errno of EAGAIN
-        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) {
-            die("read");
-        }
-        if (iscntrl(c)) { // if c is a control character, print it as a decimal number (it's ASCII code)
-            printf("%d\r\n", c);
-        } else { // Else, print out it's ASCII code and c itself
-            printf("%d ('%c')\r\n", c, c);
-        }
-        if (c == CTRL_KEY('q')) { // If ctrl+q is pressed, exit
-            break;
-        }
+        editorProcessKeypress();
     }
 
     return 0;
